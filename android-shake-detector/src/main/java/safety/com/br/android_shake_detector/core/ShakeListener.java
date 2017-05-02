@@ -1,4 +1,4 @@
-package safety.com.br.android_shake_detector;
+package safety.com.br.android_shake_detector.core;
 
 import android.content.Context;
 import android.content.Intent;
@@ -6,6 +6,7 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
+import android.util.Log;
 
 /**
  * @author netodevel
@@ -20,20 +21,22 @@ public class ShakeListener implements SensorEventListener {
 
     private int mShakeCount;
 
-    private ShakeCallback shakeCallback;
-
     private ShakeOptions shakeOptions;
 
     private Context context;
 
     public ShakeListener(){}
 
-    public ShakeListener(ShakeOptions shakeOptions, ShakeCallback callback) {
-        this.shakeCallback = callback;
+    public ShakeListener(ShakeOptions shakeOptions) {
         this.shakeOptions = shakeOptions;
     }
 
     public ShakeListener(ShakeOptions shakeOptions, Context context) {
+        this.shakeOptions = shakeOptions;
+        this.context = context;
+    }
+
+    public ShakeListener(ShakeOptions shakeOptions, Context context, ShakeCallback callback) {
         this.shakeOptions = shakeOptions;
         this.context = context;
     }
@@ -68,6 +71,7 @@ public class ShakeListener implements SensorEventListener {
         float gForce = (float) Math.sqrt(gX * gX + gY * gY + gZ * gZ);
 
         if (gForce > this.shakeOptions.getSensibility()) {
+
             final long now = System.currentTimeMillis();
 
             if (mShakeTimestamp + SHAKE_SLOP_TIME_MS > now) {
@@ -82,11 +86,7 @@ public class ShakeListener implements SensorEventListener {
             mShakeCount++;
 
             if (this.shakeOptions.getShakeCounts() == mShakeCount) {
-                if (this.shakeCallback != null) {
-                    this.shakeCallback.onShake();
-                } else {
-                    sendToBroadCasts(this.context);
-                }
+                sendToBroadCasts(this.context);
             }
         }
     }
@@ -96,4 +96,5 @@ public class ShakeListener implements SensorEventListener {
         locationIntent.setAction("shake.detector");
         context.sendBroadcast(locationIntent);
     }
+
 }

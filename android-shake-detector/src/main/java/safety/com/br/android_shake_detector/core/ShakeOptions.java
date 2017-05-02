@@ -1,4 +1,4 @@
-package safety.com.br.android_shake_detector;
+package safety.com.br.android_shake_detector.core;
 
 /**
  * @author netodevel

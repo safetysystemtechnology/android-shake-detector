@@ -1,14 +1,12 @@
-package safety.com.br.android_shake_detector;
+package safety.com.br.android_shake_detector.core;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.hardware.Sensor;
 import android.hardware.SensorManager;
-import android.widget.Toast;
 
 import java.util.List;
-
-import safety.com.br.android_shake_detector.core.ShakeService;
 
 /**
  * @author netodevel
@@ -27,6 +25,10 @@ public class ShakeDetector {
 
     private ShakeOptions shakeOptions;
 
+    private AppPreferences appPreferences;
+
+    private ShakeBroadCastReceiver shakeBroadCastReceiver;
+
     public ShakeDetector() {
     }
 
@@ -36,13 +38,13 @@ public class ShakeDetector {
 
     public ShakeDetector start(Context context, ShakeCallback shakeCallback) {
         this.shakeCallback = shakeCallback;
-        this.sensorManager = (SensorManager) context.getSystemService(Context.SENSOR_SERVICE);
-        List<Sensor> sensors = this.sensorManager.getSensorList(Sensor.TYPE_ACCELEROMETER);
-        if (sensors.size() > 0) {
-            sensor = sensors.get(0);
-            isRunning = this.sensorManager.registerListener(new ShakeListener(this.shakeOptions, shakeCallback), sensor, SensorManager.SENSOR_DELAY_GAME);
-            startShakeService(context);
+        shakeBroadCastReceiver = new ShakeBroadCastReceiver(shakeCallback);
+
+        if (this.shakeOptions.isBackground()) {
+            registerPrivateBroadCast(context);
         }
+        saveOptionsInStorage(context);
+        startShakeService(context);
         return this;
     }
 
@@ -61,16 +63,18 @@ public class ShakeDetector {
         return this;
     }
 
-    private Boolean isSupported(Context context) {
-        this.context = context;
-        if (context != null) {
-            sensorManager = (SensorManager) context.getSystemService(Context.SENSOR_SERVICE);
-            List<Sensor> sensors = sensorManager.getSensorList(Sensor.TYPE_ACCELEROMETER);
-            if (sensors.size() > 0) {
-                return true;
-            }
-        }
-        return false;
+    public void saveOptionsInStorage(Context context) {
+        this.appPreferences = new AppPreferences(context);
+        this.appPreferences.putBoolean("BACKGROUND", this.shakeOptions.isBackground());
+        this.appPreferences.putInt("SHAKE_COUNT", this.shakeOptions.getShakeCounts());
+        this.appPreferences.putInt("INTERVAL", this.shakeOptions.getInterval());
+        this.appPreferences.putFloat("SENSIBILITY", this.shakeOptions.getSensibility());
+    }
+
+    private void registerPrivateBroadCast(Context context) {
+        IntentFilter filter = new IntentFilter();
+        filter.addAction("shake.detector");
+        context.registerReceiver(shakeBroadCastReceiver, filter);
     }
 
     public Boolean isRunning() {
