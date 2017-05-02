@@ -23,7 +23,7 @@ public class MainActivity extends AppCompatActivity {
         ShakeOptions options = new ShakeOptions()
                 .background(true)
                 .interval(1000)
-                .shakeCount(5)
+                .shakeCount(2)
                 .sensibility(2.0f);
 
         this.shakeDetector = new ShakeDetector(options).start(this, new ShakeCallback() {
@@ -32,6 +32,18 @@ public class MainActivity extends AppCompatActivity {
                 Log.d("event", "onShake");
             }
         });
+    }
+
+    @Override
+    protected void onStop() {
+        this.shakeDetector.stop(getBaseContext());
+        super.onStop();
+    }
+
+    @Override
+    protected void onDestroy() {
+        this.shakeDetector.stop(getBaseContext());
+        super.onDestroy();
     }
 
 }

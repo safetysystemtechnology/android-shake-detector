@@ -38,6 +38,11 @@ public class ShakeService extends Service {
         }
     }
 
+    @Override
+    public void onDestroy() {
+        shakeDetector.stop(getBaseContext());
+        super.onDestroy();
+    }
 
     @Nullable
     @Override

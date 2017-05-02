@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.hardware.Sensor;
 import android.hardware.SensorManager;
+import android.util.Log;
 
 import java.util.List;
 
@@ -38,14 +39,22 @@ public class ShakeDetector {
 
     public ShakeDetector start(Context context, ShakeCallback shakeCallback) {
         this.shakeCallback = shakeCallback;
-        shakeBroadCastReceiver = new ShakeBroadCastReceiver(shakeCallback);
+        this.shakeBroadCastReceiver = new ShakeBroadCastReceiver(shakeCallback);
 
         if (this.shakeOptions.isBackground()) {
-            registerPrivateBroadCast(context);
+            if (!this.shakeBroadCastReceiver.isOrderedBroadcast() == false) {
+                registerPrivateBroadCast(context);
+            }
         }
         saveOptionsInStorage(context);
         startShakeService(context);
         return this;
+    }
+
+    public void stop(Context context) {
+        if (this.shakeBroadCastReceiver.isOrderedBroadcast()) {
+            context.unregisterReceiver(this.shakeBroadCastReceiver);
+        }
     }
 
     private void startShakeService(Context context) {
@@ -74,7 +83,7 @@ public class ShakeDetector {
     private void registerPrivateBroadCast(Context context) {
         IntentFilter filter = new IntentFilter();
         filter.addAction("shake.detector");
-        context.registerReceiver(shakeBroadCastReceiver, filter);
+        context.registerReceiver(this.shakeBroadCastReceiver, filter);
     }
 
     public Boolean isRunning() {
