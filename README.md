@@ -1,8 +1,25 @@
-# android-shake-detector
-Detect shaking of the device
+![](https://jitpack.io/v/safetysystemtechnology/android-shake-detector.svg)
 
-# Install
-Todo
+
+# android-shake-detector
+Detect shaking of the device 
+
+## Install 
+Add the dependecy
+
+```gradle
+allprojects {
+  repositories {
+    ...
+    maven { url 'https://jitpack.io' }
+  }
+}
+
+dependencies {
+    compile 'com.github.safetysystemtechnology:android-shake-detector:v1.0'
+}
+
+```
 
 ## Add permissions in your AndroidManifest.xml
 ```xml
