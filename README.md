@@ -16,7 +16,7 @@ allprojects {
 }
 
 dependencies {
-    compile 'com.github.safetysystemtechnology:android-shake-detector:v1.0'
+   compile 'com.github.safetysystemtechnology:android-shake-detector:v1.2'
 }
 
 ```
@@ -47,18 +47,45 @@ protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_main);
 
+    buildView();
+
     ShakeOptions options = new ShakeOptions()
             .background(true)
-            .interval(2000)
+            .interval(1000)
             .shakeCount(2)
-            .sensibility(1.2f);
+            .sensibility(2.0f);
 
     this.shakeDetector = new ShakeDetector(options).start(this, new ShakeCallback() {
         @Override
         public void onShake() {
-            ...
+            Log.d("event", "onShake");
         }
     });
+
+    //IF YOU WANT JUST IN BACKGROUND
+    //this.shakeDetector = new ShakeDetector(options).start(this);
+}
+
+private void buildView() {
+    Button btnStopService = (Button) findViewById(R.id.btnStopService);
+    btnStopService.setOnClickListener(new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            Log.d("destroy", "destroy service shake");
+            shakeDetector.stopShakeDetector(getBaseContext());
+        }
+    });
+}
+
+@Override
+protected void onStop() {
+    super.onStop();
+}
+
+@Override
+protected void onDestroy() {
+    shakeDetector.destroy(getBaseContext());
+    super.onDestroy();
 }
 ```
 if you will run in background, create your broadcast receiver
