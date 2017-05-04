@@ -15,8 +15,6 @@ public class ShakeListener implements SensorEventListener {
 
     private static final int SHAKE_SLOP_TIME_MS = 500;
 
-    private OnShakeListener mListener;
-
     private long mShakeTimestamp;
 
     private int mShakeCount;
@@ -39,10 +37,6 @@ public class ShakeListener implements SensorEventListener {
     public ShakeListener(ShakeOptions shakeOptions, Context context, ShakeCallback callback) {
         this.shakeOptions = shakeOptions;
         this.context = context;
-    }
-
-    public void setOnShakeListener(OnShakeListener listener) {
-        this.mListener = listener;
     }
 
     public interface OnShakeListener {
@@ -72,6 +66,8 @@ public class ShakeListener implements SensorEventListener {
 
         if (gForce > this.shakeOptions.getSensibility()) {
 
+            Log.d("LISTENER", "force: " + gForce + " count: " + mShakeCount);
+
             final long now = System.currentTimeMillis();
 
             if (mShakeTimestamp + SHAKE_SLOP_TIME_MS > now) {
@@ -87,6 +83,7 @@ public class ShakeListener implements SensorEventListener {
 
             if (this.shakeOptions.getShakeCounts() == mShakeCount) {
                 sendToBroadCasts(this.context);
+                sendToPrivateBroadCasts(this.context);
             }
         }
     }
@@ -94,6 +91,12 @@ public class ShakeListener implements SensorEventListener {
     private void sendToBroadCasts(Context context) {
         Intent locationIntent = new Intent();
         locationIntent.setAction("shake.detector");
+        context.sendBroadcast(locationIntent);
+    }
+
+    private void sendToPrivateBroadCasts(Context context) {
+        Intent locationIntent = new Intent();
+        locationIntent.setAction("private.shake.detector");
         context.sendBroadcast(locationIntent);
     }
 

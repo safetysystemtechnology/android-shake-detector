@@ -3,6 +3,8 @@ package safety.com.br.shake_sample;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.View;
+import android.widget.Button;
 
 import safety.com.br.android_shake_detector.core.ShakeCallback;
 import safety.com.br.android_shake_detector.core.ShakeDetector;
@@ -20,6 +22,8 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        buildView();
+
         ShakeOptions options = new ShakeOptions()
                 .background(true)
                 .interval(1000)
@@ -32,17 +36,30 @@ public class MainActivity extends AppCompatActivity {
                 Log.d("event", "onShake");
             }
         });
+
+        //IF YOU WANT JUST IN BACKGROUND
+        //this.shakeDetector = new ShakeDetector(options).start(this);
+    }
+
+    private void buildView() {
+        Button btnStopService = (Button) findViewById(R.id.btnStopService);
+        btnStopService.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Log.d("destroy", "destroy service shake");
+                shakeDetector.stopShakeDetector(getBaseContext());
+            }
+        });
     }
 
     @Override
     protected void onStop() {
-        this.shakeDetector.stop(getBaseContext());
         super.onStop();
     }
 
     @Override
     protected void onDestroy() {
-        this.shakeDetector.stop(getBaseContext());
+        shakeDetector.destroy(getBaseContext());
         super.onDestroy();
     }
 

@@ -9,6 +9,7 @@ import android.util.Log;
  * @author netodevel
  */
 public class ShakeReceiver extends BroadcastReceiver {
+
     @Override
     public void onReceive(Context context, Intent intent) {
         if (null != intent && intent.getAction().equals("shake.detector")) {

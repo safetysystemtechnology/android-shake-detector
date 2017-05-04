@@ -30,6 +30,8 @@ public class ShakeDetector {
 
     private ShakeBroadCastReceiver shakeBroadCastReceiver;
 
+    private ShakeListener shakeListener;
+
     public ShakeDetector() {
     }
 
@@ -41,20 +43,27 @@ public class ShakeDetector {
         this.shakeCallback = shakeCallback;
         this.shakeBroadCastReceiver = new ShakeBroadCastReceiver(shakeCallback);
 
-        if (this.shakeOptions.isBackground()) {
-            if (!this.shakeBroadCastReceiver.isOrderedBroadcast() == false) {
-                registerPrivateBroadCast(context);
-            }
-        }
+        registerPrivateBroadCast(context);
+        saveOptionsInStorage(context);
+        startShakeService(context);
+
+        return this;
+    }
+
+    public ShakeDetector start(Context context) {
         saveOptionsInStorage(context);
         startShakeService(context);
         return this;
     }
 
-    public void stop(Context context) {
-        if (this.shakeBroadCastReceiver.isOrderedBroadcast()) {
+    public void destroy(Context context) {
+        if (this.shakeBroadCastReceiver != null) {
             context.unregisterReceiver(this.shakeBroadCastReceiver);
         }
+    }
+
+    public void stopShakeDetector(Context context) {
+        context.stopService(new Intent(context, ShakeService.class));
     }
 
     private void startShakeService(Context context) {
@@ -63,11 +72,12 @@ public class ShakeDetector {
     }
 
     public ShakeDetector startService(Context context) {
+        this.shakeListener = new ShakeListener(this.shakeOptions, context);
         this.sensorManager = (SensorManager) context.getSystemService(Context.SENSOR_SERVICE);
         List<Sensor> sensors = this.sensorManager.getSensorList(Sensor.TYPE_ACCELEROMETER);
         if (sensors.size() > 0) {
             sensor = sensors.get(0);
-            isRunning = this.sensorManager.registerListener(new ShakeListener(this.shakeOptions, context), sensor, SensorManager.SENSOR_DELAY_GAME);
+            isRunning = this.sensorManager.registerListener(this.shakeListener, sensor, SensorManager.SENSOR_DELAY_GAME);
         }
         return this;
     }
@@ -83,6 +93,7 @@ public class ShakeDetector {
     private void registerPrivateBroadCast(Context context) {
         IntentFilter filter = new IntentFilter();
         filter.addAction("shake.detector");
+        filter.addAction("private.shake.detector");
         context.registerReceiver(this.shakeBroadCastReceiver, filter);
     }
 
