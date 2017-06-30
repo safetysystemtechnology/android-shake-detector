@@ -86,7 +86,7 @@ public class ShakeDetector {
         this.appPreferences = new AppPreferences(context);
         this.appPreferences.putBoolean("BACKGROUND", this.shakeOptions.isBackground());
         this.appPreferences.putInt("SHAKE_COUNT", this.shakeOptions.getShakeCounts());
-        this.appPreferences.putInt("INTERVAL", this.shakeOptions.getInterval());
+        this.appPreferences.putInt("SHAKE_INTERVAL", this.shakeOptions.getInterval());
         this.appPreferences.putFloat("SENSIBILITY", this.shakeOptions.getSensibility());
     }
 

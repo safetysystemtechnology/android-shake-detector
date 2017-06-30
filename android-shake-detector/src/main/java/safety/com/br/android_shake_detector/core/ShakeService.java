@@ -38,7 +38,7 @@ public class ShakeService extends Service {
                 .background(appPreferences.getBoolean("BACKGROUND", true))
                 .sensibility(appPreferences.getFloat("SENSIBILITY", 1.2f))
                 .shakeCount(appPreferences.getInt("SHAKE_COUNT", 1))
-                .interval(appPreferences.getInt("INTERVAL", 2000));
+                .interval(appPreferences.getInt("SHAKE_INTERVAL", 2000));
 
         startShakeService(getBaseContext());
 
