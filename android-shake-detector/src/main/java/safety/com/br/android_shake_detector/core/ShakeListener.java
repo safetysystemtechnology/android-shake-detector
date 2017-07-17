@@ -82,8 +82,11 @@ public class ShakeListener implements SensorEventListener {
             mShakeCount++;
 
             if (this.shakeOptions.getShakeCounts() == mShakeCount) {
-                sendToBroadCasts(this.context);
-                sendToPrivateBroadCasts(this.context);
+                if (this.shakeOptions.isBackground()) {
+                    sendToBroadCasts(this.context);
+                } else {
+                    sendToPrivateBroadCasts(this.context);
+                }
             }
         }
     }

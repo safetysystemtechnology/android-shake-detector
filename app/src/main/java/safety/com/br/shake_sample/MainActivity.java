@@ -25,7 +25,7 @@ public class MainActivity extends AppCompatActivity {
         buildView();
 
         ShakeOptions options = new ShakeOptions()
-                .background(true)
+                .background(false)
                 .interval(1000)
                 .shakeCount(2)
                 .sensibility(2.0f);
